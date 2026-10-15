@@ -1,0 +1,33 @@
+{
+  "id": "dmsSyncthingMonitor",
+  "name": "Syncthing Monitor",
+  "description": "Show Syncthing conflicts and disconnected peers in DankBar",
+  "version": "1.0.0",
+  "license": "GPL-2.0-only",
+  "author": "Ishaan",
+  "icon": "sync_problem",
+  "type": "composite",
+  "capabilities": [
+    "daemon",
+    "dankbar-widget"
+  ],
+  "components": {
+    "daemon": "./SyncthingMonitorDaemon.qml",
+    "widget": "./SyncthingMonitorWidget.qml"
+  },
+  "startupCheck": "./StartupCheck.qml",
+  "dependencies": [
+    "bash",
+    "curl",
+    "jq",
+    "fd or fdfind",
+    "coreutils",
+    "notify-send"
+  ],
+  "permissions": [
+    "settings_read",
+    "process",
+    "network"
+  ],
+  "requires_dms": ">=1.6.0"
+}
