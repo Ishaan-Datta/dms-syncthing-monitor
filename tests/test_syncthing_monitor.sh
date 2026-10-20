@@ -10,7 +10,12 @@ mkdir -p \
   "$temporary_directory/bin" \
   "$temporary_directory/Documents/ignored" \
   "$temporary_directory/Documents/.stversions" \
-  "$temporary_directory/Obsidian"
+  "$temporary_directory/Obsidian" \
+  "$temporary_directory/state/syncthing"
+
+printf '%s\n' \
+  '<configuration><gui><apikey>secret-test-key</apikey></gui></configuration>' \
+  > "$temporary_directory/state/syncthing/config.xml"
 
 {
   printf '#!%s\n' "$(command -v bash)"
@@ -30,7 +35,6 @@ jq -n \
     dmsSyncthingMonitor: {
       pollIntervalMinutes: 1,
       apiUrl: "http://127.0.0.1:8384",
-      apiKey: "secret-test-key",
       folders: [
         {label: "Documents", path: $documents},
         {label: "Obsidian", path: $obsidian}
@@ -54,6 +58,7 @@ EOF
 
 run_monitor() {
   PATH="$temporary_directory/bin:$PATH" \
+  XDG_STATE_HOME="$temporary_directory/state" \
   DMS_PLUGIN_SETTINGS_FILE="$settings_file" \
   MOCK_CONNECTIONS_FILE="$connections_file" \
     bash "$project_root/syncthing_monitor.sh"

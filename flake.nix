@@ -112,6 +112,7 @@
                   curl
                   fd
                   jq
+                  libxml2
                 ];
               }
               ''
@@ -136,6 +137,7 @@
               jq
               libnotify
               nixfmt
+              libxml2
               shellcheck
             ];
           };

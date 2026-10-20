@@ -34,6 +34,18 @@ QtObject {
 
                     done(null)
                 })
+
+                Proc.runCommand("dmsSyncthingMonitor.checkXmllint", ["which", "xmllint"], (notifyStdout, notifyExitCode) => {
+                    if (notifyExitCode !== 0) {
+                        done({
+                            title: "libxml2 is required",
+                            details: "Install libnxml and ensure xmllint is available on PATH, then re-enable Syncthing Monitor."
+                        })
+                        return
+                    }
+
+                    done(null)
+                })
             })
         })
     }

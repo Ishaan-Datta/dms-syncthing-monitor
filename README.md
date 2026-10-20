@@ -23,6 +23,7 @@ copies, no connected peers, or cannot be checked.
 - curl
 - jq
 - coreutils
+- libxml2
 - `fd` or `fdfind`
 - `notify-send` from libnotify
 - A local Syncthing GUI/API
@@ -49,6 +50,7 @@ Home Manager module:
             fd
             jq
             libnotify
+            libxml2
           ];
 
           programs.dank-material-shell.plugins.dmsSyncthingMonitor = {
@@ -64,15 +66,13 @@ Home Manager module:
 
 ## Configuration
 
-There is no settings page. Add the plugin configuration to
-`~/.config/DankMaterialShell/plugin_settings.json`:
+Add the plugin configuration to `~/.config/DankMaterialShell/plugin_settings.json`:
 
 ```json
 {
   "dmsSyncthingMonitor": {
     "pollIntervalMinutes": 1,
     "apiUrl": "http://127.0.0.1:8384",
-    "apiKey": "YOUR_API_KEY",
     "insecureTls": false,
     "folders": [
       {
@@ -88,9 +88,8 @@ There is no settings page. Add the plugin configuration to
 }
 ```
 
-`apiUrl`, `apiKey`, and at least one labeled absolute folder path are required.
+`apiUrl`, and at least one labeled absolute folder path are required.
 The polling interval defaults to one minute and is clamped to 1–60 minutes.
-The API key is stored as plain text in the DMS plugin settings file.
 Set `insecureTls` to `true` only when a local HTTPS GUI uses Syncthing's
 self-signed certificate.
 
@@ -110,13 +109,3 @@ contents are never read.
 Paths are displayed as `label/relative/path`. The desktop notification contains
 at most five paths followed by `and N more`; the plugin popout provides the
 complete scrollable list.
-
-## Development
-
-```console
-nix develop
-bash tests/test_syncthing_monitor.sh
-shellcheck syncthing_monitor.sh tests/test_syncthing_monitor.sh
-nixfmt flake.nix
-nix flake check
-```

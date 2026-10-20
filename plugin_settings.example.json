@@ -2,7 +2,6 @@
   "dmsSyncthingMonitor": {
     "pollIntervalMinutes": 1,
     "apiUrl": "http://127.0.0.1:8384",
-    "apiKey": "YOUR_API_KEY",
     "insecureTls": false,
     "folders": [
       {

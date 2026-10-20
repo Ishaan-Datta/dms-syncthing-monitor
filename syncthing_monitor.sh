@@ -82,7 +82,6 @@ fi
 
 if ! jq -e '
   (.apiUrl | type == "string" and length > 0) and
-  (.apiKey | type == "string" and length > 0) and
   ((.insecureTls // false) | type == "boolean") and
   (.folders | type == "array" and length > 0) and
   all(.folders[];
@@ -93,12 +92,21 @@ if ! jq -e '
 ' >/dev/null 2>&1 <<< "$config"; then
   emit_configuration_error \
     "SETTINGS_INVALID" \
-    "Set apiUrl, apiKey, and at least one labeled absolute folder path"
+    "Set apiUrl and at least one labeled absolute folder path"
   exit 0
 fi
 
 api_url="$(jq -r '.apiUrl' <<< "$config")"
-api_key="$(jq -r '.apiKey' <<< "$config")"
+
+syncthing_config="${XDG_STATE_HOME:-$HOME/.local/state}/syncthing/config.xml"
+[[ -r "$syncthing_config" ]] || syncthing_config="${XDG_CONFIG_HOME:-$HOME/.config}/syncthing/config.xml"
+
+api_key="$(xmllint --xpath 'string(/configuration/gui/apikey)' "$syncthing_config" 2>/dev/null)"
+if [[ -z "$api_key" ]]; then
+  emit_configuration_error "API_KEY_MISSING" "Cannot read Syncthing API key from config.xml"
+  exit 0
+fi
+
 insecure_tls="$(jq -r '.insecureTls // false' <<< "$config")"
 api_url="${api_url%/}"
 fd_command="$(find_fd)"

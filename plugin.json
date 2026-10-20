@@ -22,7 +22,8 @@
     "jq",
     "fd or fdfind",
     "coreutils",
-    "notify-send"
+    "notify-send",
+    "libxml2"
   ],
   "permissions": [
     "settings_read",
