@@ -24,7 +24,9 @@ PluginComponent {
         return issues
     }
     readonly property bool hasIssues: monitorState.phase === "ready" && activeIssues.length > 0
+    readonly property real issueListViewportHeight: Math.min(issueListContentHeight, 380)
     property string expandedIssueId: ""
+    property real issueListContentHeight: 0
 
     function updateVisibility() {
         setVisibilityOverride(hasIssues)
@@ -45,19 +47,17 @@ PluginComponent {
     Component.onCompleted: updateVisibility()
 
     popoutWidth: 420
-    popoutHeight: Math.min(520, 120 + Math.max(80, activeIssues.length * 90) + (expandedIssueId === "conflicts" ? 230 : 0))
+    popoutHeight: issueListViewportHeight + 100
 
     popoutContent: Component {
         PopoutComponent {
             headerText: "Syncthing warnings"
-            detailsText: root.activeIssues.length === 1
-                ? "1 active issue"
-                : root.activeIssues.length + " active issues"
+            detailsText: ""
             showCloseButton: true
 
             Item {
                 width: parent.width
-                implicitHeight: Math.max(80, root.popoutHeight - 100)
+                implicitHeight: root.issueListViewportHeight
 
                 Flickable {
                     anchors.fill: parent
@@ -71,6 +71,8 @@ PluginComponent {
                         id: issueList
                         width: parent.width
                         spacing: Theme.spacingS
+                        onImplicitHeightChanged: root.issueListContentHeight = implicitHeight
+                        Component.onCompleted: root.issueListContentHeight = implicitHeight
 
                         Repeater {
                             model: root.activeIssues
@@ -79,8 +81,8 @@ PluginComponent {
                                 id: issueCard
                                 required property var modelData
                                 readonly property var issue: modelData
-                                readonly property var paths: Array.isArray(issue.paths) ? issue.paths : []
-                                readonly property bool expandable: paths.length > 0
+                                readonly property var paths: issue.paths ?? []
+                                readonly property bool expandable: Number(paths.length ?? 0) > 0
                                 readonly property bool expanded: root.expandedIssueId === String(issue.id ?? "")
 
                                 width: issueList.width
@@ -171,6 +173,7 @@ PluginComponent {
                                 MouseArea {
                                     anchors.fill: parent
                                     enabled: issueCard.expandable
+                                    hoverEnabled: enabled
                                     cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                                     onClicked: {
                                         root.expandedIssueId = issueCard.expanded ? "" : String(issueCard.issue.id ?? "")
